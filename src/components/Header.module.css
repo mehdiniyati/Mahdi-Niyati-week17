@@ -1,0 +1,30 @@
+.container {
+  margin: 50px 0;
+  text-align: center;
+}
+
+.container h1 {
+  color: #304ffe;
+  margin-bottom: 20px;
+}
+
+.container p {
+  color: gray;
+}
+
+.container a {
+  text-decoration: none;
+  color: #304ffe;
+  background-color: #bbdefb;
+  padding: 3px 5px;
+  border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -o-border-radius: 5px;
+}
+
+.container a:hover {
+  color: #bbdefb;
+  background-color: #304ffe;
+}
