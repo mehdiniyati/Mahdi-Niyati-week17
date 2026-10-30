@@ -1,10 +1,9 @@
 import styles from "./Header.module.css";
-import { Userscontext } from "../Context/UserContext";
+import { Userscontext } from "../Context/Userscontext";
 import { useContext } from "react";
 
 const Header = () => {
-  const result = useContext(Userscontext);
-  console.log(result);
+  useContext(Userscontext);
 
   return (
     <div className={styles.container}>

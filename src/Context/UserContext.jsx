@@ -1,4 +1,5 @@
-import { createContext, useEffect } from "react";
+import { useEffect } from "react";
+import { Userscontext } from "./Userscontext";
 import { useReducer } from "react";
 import axios from "axios";
 
@@ -74,8 +75,6 @@ const reducer = (state, action) => {
       return state;
   }
 };
-
-export const Userscontext = createContext();
 
 const UserContext = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
