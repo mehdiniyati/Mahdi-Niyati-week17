@@ -1,4 +1,17 @@
 @import "tailwindcss";
+@theme {
+  --color-petrol-50: #eef7fa;
+  --color-petrol-100: #d9edf3;
+  --color-petrol-200: #b0d7e5;
+  --color-petrol-300: #7bb8d0;
+  --color-petrol-400: #4597b6;
+  --color-petrol-500: #277d9e;
+  --color-petrol-600: #1b6381;
+  --color-petrol-700: #174f68;
+  --color-petrol-800: #153f53;
+  --color-petrol-900: #103244;
+  --color-petrol-950: #082735;
+}
 @custom-variant dark (&:where(.dark, .dark *));
 :root {
   font-family: "Inter Variable", "Segoe UI", sans-serif;
@@ -30,15 +43,15 @@ button:disabled {
   opacity: 0.45;
 }
 :focus-visible {
-  outline: 3px solid #34b389;
+  outline: 3px solid #3b9fc2;
   outline-offset: 4px;
 }
 @layer components {
   .logo {
-    @apply flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-800 text-white;
+    @apply flex h-10 w-10 items-center justify-center rounded-xl bg-petrol-800 text-white;
   }
   .primary-button {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-800 px-5 py-3 text-sm font-medium text-white shadow-lg shadow-emerald-900/10 transition-colors hover:bg-emerald-900 dark:bg-emerald-600 dark:hover:bg-emerald-500;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-petrol-800 px-5 py-3 text-sm font-medium text-white shadow-lg shadow-petrol-900/10 transition-colors hover:bg-petrol-900 dark:bg-petrol-600 dark:hover:bg-petrol-500;
   }
   .icon-button {
     @apply inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-stone-500 transition-colors hover:bg-stone-100 hover:text-stone-900 dark:text-stone-400 dark:hover:bg-white/10 dark:hover:text-white;
@@ -47,7 +60,7 @@ button:disabled {
     @apply inline-flex items-center justify-center gap-2 rounded-xl border border-stone-200 bg-white px-4 py-2.5 text-sm font-medium text-stone-600 transition-colors hover:bg-stone-50 dark:border-white/10 dark:bg-white/5 dark:text-stone-300 dark:hover:bg-white/10;
   }
   .form-input {
-    @apply mt-2 w-full rounded-xl border border-stone-200 bg-stone-50/60 px-4 py-3 text-sm outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 dark:border-white/10 dark:bg-white/5;
+    @apply mt-2 w-full rounded-xl border border-stone-200 bg-stone-50/60 px-4 py-3 text-sm outline-none transition focus:border-petrol-500 focus:ring-4 focus:ring-petrol-500/10 dark:border-white/10 dark:bg-white/5;
   }
   .contact-actions {
     @apply flex items-center gap-1 rounded-xl bg-stone-50 p-1 transition-all duration-200 dark:bg-white/5;
@@ -83,4 +96,15 @@ html[lang="fa"] [class*="tracking-"] {
 html[dir="rtl"] .sidebar svg.lucide-arrow-up-right,
 html[dir="rtl"] svg.lucide-arrow-right {
   transform: scaleX(-1);
+}
+
+.contact-card {
+  background-image: linear-gradient(
+    140deg,
+    rgb(69 151 182 / 0.06),
+    transparent 55%
+  );
+}
+.contact-card:hover {
+  border-color: var(--color-petrol-400);
 }

@@ -88,7 +88,7 @@ function Modal({ contact, onClose }) {
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.96, y: 10 }}
         transition={{ type: "spring", damping: 28, stiffness: 320 }}
-        className="relative my-auto w-full max-w-lg rounded-3xl border border-white/80 bg-white p-6 shadow-2xl sm:p-8 dark:border-white/10 dark:bg-[#1d2320]"
+        className="relative my-auto w-full max-w-lg rounded-3xl border border-white/80 bg-white p-6 shadow-2xl sm:p-8 dark:border-white/10 dark:bg-[#143342]"
       >
         <button
           onClick={onClose}
@@ -97,7 +97,7 @@ function Modal({ contact, onClose }) {
         >
           <X size={19} />
         </button>
-        <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300">
+        <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-petrol-50 text-petrol-800 dark:bg-petrol-900/40 dark:text-petrol-300">
           <UserRound size={23} />
         </div>
         <h2
@@ -149,7 +149,7 @@ function Modal({ contact, onClose }) {
               >
                 {t(field.label)}
                 {field.key === "name" && (
-                  <span className="ms-1 text-emerald-600">*</span>
+                  <span className="ms-1 text-petrol-600">*</span>
                 )}
                 <input
                   className="form-input"

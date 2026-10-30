@@ -16,6 +16,8 @@ import {
   Plus,
   X,
   Check,
+  Star,
+  ArrowDownUp,
 } from "lucide-react";
 import { Userscontext } from "../Context/Userscontext";
 
@@ -27,18 +29,29 @@ const colors = [
 ];
 
 export default function ContactsList({ onAdd }) {
-  const { t, number } = useLanguage();
+  const { t, number, language } = useLanguage();
   const { state, dispatch } = useContext(Userscontext);
   const { data, selected, searchTerm } = state;
   const reduced = useReducedMotion();
   const q = searchTerm.toLowerCase().trim();
-  const filtered = data.filter((user) =>
-    ["name", "lastName", "email", "phone"].some((key) =>
-      String(user[key] || "")
-        .toLowerCase()
-        .includes(q),
-    ),
-  );
+  const filtered = data
+    .filter((user) => state.view !== "favorites" || user.favorite)
+    .filter((user) =>
+      ["name", "lastName", "email", "phone"].some((key) =>
+        String(user[key] || "")
+          .toLowerCase()
+          .includes(q),
+      ),
+    );
+  if (state.sort !== "default")
+    filtered.sort((a, b) => {
+      const order = `${a.name} ${a.lastName}`.localeCompare(
+        `${b.name} ${b.lastName}`,
+        language,
+        { sensitivity: "base" },
+      );
+      return state.sort === "desc" ? -order : order;
+    });
   const listVariants = {
     hidden: {},
     visible: { transition: { staggerChildren: reduced ? 0 : 0.075 } },
@@ -49,6 +62,57 @@ export default function ContactsList({ onAdd }) {
   };
   return (
     <section aria-label={t("Contact directory")}>
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <div
+          className="inline-flex rounded-xl border border-stone-200 bg-white/70 p-1 dark:border-white/10 dark:bg-white/5"
+          role="group"
+          aria-label={t("Filter contacts")}
+        >
+          {["all", "favorites"].map((view) => (
+            <Motion.button
+              key={view}
+              whileTap={{ scale: 0.97 }}
+              aria-pressed={state.view === view}
+              onClick={() => dispatch({ type: "SET_VIEW", payload: view })}
+              className="relative rounded-lg px-4 py-2.5 text-xs font-medium"
+            >
+              {state.view === view && (
+                <Motion.span
+                  layoutId="contact-filter"
+                  className="absolute inset-0 rounded-lg bg-petrol-800 shadow-sm dark:bg-petrol-600"
+                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                />
+              )}
+              <span
+                className={`relative flex items-center gap-2 ${state.view === view ? "text-white" : "text-stone-500 dark:text-stone-300"}`}
+              >
+                {view === "favorites" ? (
+                  <Star size={14} />
+                ) : (
+                  <Users size={14} />
+                )}{" "}
+                {t(view === "favorites" ? "Favorites" : "All contacts")}
+              </span>
+            </Motion.button>
+          ))}
+        </div>
+        <label className="flex items-center gap-2 text-xs text-stone-500 dark:text-stone-300">
+          <ArrowDownUp size={15} />
+          <span className="sr-only">{t("Sort contacts")}</span>
+          <select
+            aria-label={t("Sort contacts")}
+            value={state.sort}
+            onChange={(e) =>
+              dispatch({ type: "SET_SORT", payload: e.target.value })
+            }
+            className="max-w-48 rounded-lg border border-stone-200 bg-white p-2.5 dark:border-white/10 dark:bg-petrol-900"
+          >
+            <option value="default">{t("Original order")}</option>
+            <option value="asc">{t("Name: ascending")}</option>
+            <option value="desc">{t("Name: descending")}</option>
+          </select>
+        </label>
+      </div>
       <div className="mb-8 grid gap-3 sm:grid-cols-3">
         {[
           {
@@ -104,7 +168,7 @@ export default function ContactsList({ onAdd }) {
           <input
             aria-label={t("Search contacts")}
             placeholder={t("Search your contacts…")}
-            className="w-full rounded-xl border border-stone-200 bg-white py-2.5 pl-10 pr-10 text-sm outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 dark:border-white/10 dark:bg-white/5"
+            className="w-full rounded-xl border border-stone-200 bg-white py-2.5 pl-10 pr-10 text-sm outline-none transition focus:border-petrol-500 focus:ring-4 focus:ring-petrol-500/10 dark:border-white/10 dark:bg-white/5"
             value={searchTerm}
             onChange={(e) =>
               dispatch({ type: "SET_SEARCH", payload: e.target.value })
@@ -129,7 +193,7 @@ export default function ContactsList({ onAdd }) {
             exit={{ height: 0, opacity: 0 }}
             className="overflow-hidden"
           >
-            <div className="mb-5 flex items-center justify-between rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 dark:border-emerald-900 dark:bg-emerald-950">
+            <div className="mb-5 flex items-center justify-between rounded-xl border border-petrol-200 bg-petrol-50 px-4 py-3 dark:border-petrol-900 dark:bg-petrol-950">
               <span className="text-sm">
                 {t("{count} selected", { count: number(selected.length) })}
               </span>
@@ -146,7 +210,7 @@ export default function ContactsList({ onAdd }) {
       </AnimatePresence>
       <Motion.div layout className="relative">
         <Motion.div
-          key={q}
+          key={`${q}-${state.view}-${state.sort}`}
           variants={listVariants}
           initial="hidden"
           animate="visible"
@@ -177,15 +241,41 @@ export default function ContactsList({ onAdd }) {
                     reduced
                       ? {}
                       : {
-                          y: -4,
+                          y: -6,
+                          rotate: 0.25,
                           boxShadow: "0 14px 32px -16px rgb(20 60 40 / .2)",
                         }
                   }
                   whileTap={reduced ? {} : { scale: 0.995 }}
-                  className={`contact-card group relative rounded-2xl border bg-white p-6 transition-colors dark:bg-[#1d2320] ${selected.includes(user.id) ? "border-emerald-500 ring-1 ring-emerald-500" : "border-stone-200/80 dark:border-white/10"}`}
+                  className={`contact-card group relative rounded-2xl border bg-white p-6 transition-colors dark:bg-[#143342] ${selected.includes(user.id) ? "border-petrol-500 ring-1 ring-petrol-500" : "border-stone-200/80 dark:border-white/10"}`}
                 >
                   <div className="mb-5 flex items-start justify-between">
-                    <Avatar user={user} initials={initials} color={color} />
+                    <div className="flex items-center gap-3">
+                      <Avatar user={user} initials={initials} color={color} />
+                      <Motion.button
+                        whileTap={{ scale: 0.7, rotate: 20 }}
+                        whileHover={{ scale: 1.12 }}
+                        aria-pressed={Boolean(user.favorite)}
+                        aria-label={t(
+                          user.favorite
+                            ? "Unfavorite {name}"
+                            : "Favorite {name}",
+                          { name },
+                        )}
+                        onClick={() =>
+                          dispatch({
+                            type: "TOGGLE_FAVORITE",
+                            payload: user.id,
+                          })
+                        }
+                        className={`icon-button ${user.favorite ? "!text-amber-500" : ""}`}
+                      >
+                        <Star
+                          size={18}
+                          fill={user.favorite ? "currentColor" : "none"}
+                        />
+                      </Motion.button>
+                    </div>
                     <label className="relative flex h-7 w-7 cursor-pointer items-center justify-center">
                       <input
                         type="checkbox"
@@ -197,7 +287,7 @@ export default function ContactsList({ onAdd }) {
                             payload: user.id,
                           })
                         }
-                        className="peer h-4 w-4 cursor-pointer appearance-none rounded border border-stone-300 checked:border-emerald-700 checked:bg-emerald-700 dark:border-stone-600"
+                        className="peer h-4 w-4 cursor-pointer appearance-none rounded border border-stone-300 checked:border-petrol-700 checked:bg-petrol-700 dark:border-stone-600"
                       />
                       <Check
                         className="pointer-events-none absolute hidden text-white peer-checked:block"
@@ -218,7 +308,7 @@ export default function ContactsList({ onAdd }) {
                   <div className="mt-6 space-y-3 text-sm text-stone-500 dark:text-stone-400">
                     <a
                       href={user.email ? `mailto:${user.email}` : undefined}
-                      className="flex min-w-0 items-center gap-3 hover:text-emerald-700"
+                      className="flex min-w-0 items-center gap-3 hover:text-petrol-700"
                     >
                       <Mail size={15} className="shrink-0" />
                       <span className="truncate" dir="auto">
@@ -227,7 +317,7 @@ export default function ContactsList({ onAdd }) {
                     </a>
                     <a
                       href={user.phone ? `tel:${user.phone}` : undefined}
-                      className="flex items-center gap-3 hover:text-emerald-700"
+                      className="flex items-center gap-3 hover:text-petrol-700"
                     >
                       <Phone size={15} className="shrink-0" />
                       <span className="truncate" dir="auto">
@@ -237,7 +327,7 @@ export default function ContactsList({ onAdd }) {
                   </div>
                   <div className="mt-6 flex min-h-11 items-center justify-between border-t border-stone-100 pt-4 dark:border-white/5">
                     <span className="flex items-center gap-1.5 text-[11px] text-stone-400">
-                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-500/70" />{" "}
+                      <span className="h-1.5 w-1.5 rounded-full bg-petrol-500/70" />{" "}
                       {t("In your circle")}
                     </span>
                     <div className="contact-actions">
@@ -288,14 +378,20 @@ export default function ContactsList({ onAdd }) {
             animate={{ opacity: 1, y: 0 }}
             className="flex flex-col items-center rounded-2xl border border-dashed border-stone-300 bg-white/40 px-6 py-20 text-center dark:border-white/15 dark:bg-white/[.02]"
           >
-            <div className="relative mb-6 flex h-20 w-20 rotate-[-6deg] items-center justify-center rounded-3xl border border-white bg-emerald-50 text-emerald-700 shadow-lg shadow-emerald-900/5 dark:border-emerald-800 dark:bg-emerald-950">
+            <div className="relative mb-6 flex h-20 w-20 rotate-[-6deg] items-center justify-center rounded-3xl border border-white bg-petrol-50 text-petrol-700 shadow-lg shadow-petrol-900/5 dark:border-petrol-800 dark:bg-petrol-950">
               <BookIcon search={Boolean(q)} />
               <span className="absolute -right-2 -top-2 flex h-7 w-7 items-center justify-center rounded-full bg-white shadow-sm dark:bg-stone-800">
                 <Plus size={14} />
               </span>
             </div>
             <h3 className="text-xl font-semibold tracking-tight">
-              {q ? t("No connections found") : t("Your circle starts here")}
+              {q
+                ? t("No connections found")
+                : t(
+                    state.view === "favorites"
+                      ? "Your favorites belong here"
+                      : "Your circle starts here",
+                  )}
             </h3>
             <p className="mt-2 max-w-xs text-sm leading-relaxed text-stone-500 dark:text-stone-400">
               {q
@@ -303,7 +399,9 @@ export default function ContactsList({ onAdd }) {
                     "Try a different name, email, or phone number. Your people are just a search away.",
                   )
                 : t(
-                    "Add your first contact and bring the people who matter into one thoughtful space.",
+                    state.view === "favorites"
+                      ? "Tap the star on a contact to keep them close."
+                      : "Add your first contact and bring the people who matter into one thoughtful space.",
                   )}
             </p>
             <Motion.button
@@ -311,10 +409,20 @@ export default function ContactsList({ onAdd }) {
               whileTap={{ scale: 0.97 }}
               className="primary-button mt-6"
               onClick={
-                q ? () => dispatch({ type: "SET_SEARCH", payload: "" }) : onAdd
+                q
+                  ? () => dispatch({ type: "SET_SEARCH", payload: "" })
+                  : state.view === "favorites"
+                    ? () => dispatch({ type: "SET_VIEW", payload: "all" })
+                    : onAdd
               }
             >
-              {q ? t("Clear search") : t("Add your first contact")}
+              {q
+                ? t("Clear search")
+                : t(
+                    state.view === "favorites"
+                      ? "All contacts"
+                      : "Add your first contact",
+                  )}
               <ArrowUpRight size={16} />
             </Motion.button>
           </Motion.div>
