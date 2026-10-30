@@ -1,18 +1,75 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
+  font-family: "Inter Variable", "Segoe UI", sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
 }
-
-body {
-  margin: auto;
-
-  max-width: 1000px;
-  min-height: 100vh;
-  padding: 10px;
-}
-
 * {
-  padding: 0;
-  margin: 0;
   box-sizing: border-box;
+}
+body {
+  margin: 0;
+  min-width: 320px;
+}
+button,
+a,
+input {
+  -webkit-tap-highlight-color: transparent;
+}
+button,
+a {
+  touch-action: manipulation;
+}
+button {
+  cursor: pointer;
+}
+button:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+:focus-visible {
+  outline: 3px solid #34b389;
+  outline-offset: 4px;
+}
+@layer components {
+  .logo {
+    @apply flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-800 text-white;
+  }
+  .primary-button {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-800 px-5 py-3 text-sm font-medium text-white shadow-lg shadow-emerald-900/10 transition-colors hover:bg-emerald-900 dark:bg-emerald-600 dark:hover:bg-emerald-500;
+  }
+  .icon-button {
+    @apply inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-stone-500 transition-colors hover:bg-stone-100 hover:text-stone-900 dark:text-stone-400 dark:hover:bg-white/10 dark:hover:text-white;
+  }
+  .secondary-button {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-stone-200 bg-white px-4 py-2.5 text-sm font-medium text-stone-600 transition-colors hover:bg-stone-50 dark:border-white/10 dark:bg-white/5 dark:text-stone-300 dark:hover:bg-white/10;
+  }
+  .form-input {
+    @apply mt-2 w-full rounded-xl border border-stone-200 bg-stone-50/60 px-4 py-3 text-sm outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 dark:border-white/10 dark:bg-white/5;
+  }
+  .contact-actions {
+    @apply flex items-center gap-1 rounded-xl bg-stone-50 p-1 transition-all duration-200 dark:bg-white/5;
+  }
+}
+@media (hover: hover) and (pointer: fine) {
+  .contact-actions {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  .contact-card:hover .contact-actions,
+  .contact-card:focus-within .contact-actions {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
