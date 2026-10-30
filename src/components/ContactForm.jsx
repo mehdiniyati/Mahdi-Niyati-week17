@@ -1,3 +1,4 @@
+import { useLanguage } from "../i18n/LanguageContext";
 import { useContext, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion as Motion } from "framer-motion";
 import { Plus, X, UserRound, ArrowRight } from "lucide-react";
@@ -18,6 +19,7 @@ export default function ContactForm({ open, onClose }) {
   );
 }
 function Modal({ contact, onClose }) {
+  const { t } = useLanguage();
   const { dispatch } = useContext(Userscontext);
   const [form, setForm] = useState(
     () => contact || { name: "", lastName: "", email: "", phone: "" },
@@ -90,8 +92,8 @@ function Modal({ contact, onClose }) {
       >
         <button
           onClick={onClose}
-          className="icon-button absolute right-5 top-5"
-          aria-label="Close modal"
+          className="icon-button absolute end-5 top-5"
+          aria-label={t("Close modal")}
         >
           <X size={19} />
         </button>
@@ -102,12 +104,12 @@ function Modal({ contact, onClose }) {
           id="contact-modal-title"
           className="text-2xl font-semibold tracking-tight"
         >
-          {contact ? "A little update" : "Make a new connection"}
+          {contact ? t("A little update") : t("Make a new connection")}
         </h2>
         <p className="mt-2 text-sm text-stone-500 dark:text-stone-400">
           {contact
-            ? "Keep their details up to date."
-            : "Good things start with staying in touch."}
+            ? t("Keep their details up to date.")
+            : t("Good things start with staying in touch.")}
         </p>
         <form onSubmit={submit} className="mt-7">
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
@@ -145,16 +147,17 @@ function Modal({ contact, onClose }) {
                 key={field.key}
                 className={`block text-xs font-medium ${["email", "phone"].includes(field.key) ? "sm:col-span-2" : ""}`}
               >
-                {field.label}
+                {t(field.label)}
                 {field.key === "name" && (
-                  <span className="ml-1 text-emerald-600">*</span>
+                  <span className="ms-1 text-emerald-600">*</span>
                 )}
                 <input
                   className="form-input"
+                  dir={["email", "phone"].includes(field.key) ? "ltr" : "auto"}
                   name={field.key}
                   type={field.type}
                   autoComplete={field.autoComplete}
-                  placeholder={field.placeholder}
+                  placeholder={t(field.placeholder)}
                   required={field.key === "name"}
                   pattern={field.key === "name" ? ".*\\S.*" : undefined}
                   value={form[field.key]}
@@ -172,7 +175,7 @@ function Modal({ contact, onClose }) {
               className="secondary-button"
               onClick={onClose}
             >
-              Cancel
+              {t("Cancel")}
             </Motion.button>
             <Motion.button
               type="submit"
@@ -181,7 +184,7 @@ function Modal({ contact, onClose }) {
               className="primary-button"
             >
               {contact ? <ArrowRight size={16} /> : <Plus size={16} />}{" "}
-              {contact ? "Save changes" : "Add contact"}
+              {contact ? t("Save changes") : t("Add contact")}
             </Motion.button>
           </div>
         </form>

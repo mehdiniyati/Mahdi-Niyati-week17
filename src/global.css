@@ -73,3 +73,14 @@ button:disabled {
     scroll-behavior: auto !important;
   }
 }
+
+html[lang="fa"] {
+  font-family: "Vazirmatn Variable", sans-serif;
+}
+html[lang="fa"] [class*="tracking-"] {
+  letter-spacing: normal;
+}
+html[dir="rtl"] .sidebar svg.lucide-arrow-up-right,
+html[dir="rtl"] svg.lucide-arrow-right {
+  transform: scaleX(-1);
+}

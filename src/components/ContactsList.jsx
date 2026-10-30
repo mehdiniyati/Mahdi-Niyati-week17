@@ -1,3 +1,4 @@
+import { useLanguage } from "../i18n/LanguageContext";
 import { useContext, useState } from "react";
 import {
   AnimatePresence,
@@ -26,6 +27,7 @@ const colors = [
 ];
 
 export default function ContactsList({ onAdd }) {
+  const { t, number } = useLanguage();
   const { state, dispatch } = useContext(Userscontext);
   const { data, selected, searchTerm } = state;
   const reduced = useReducedMotion();
@@ -46,7 +48,7 @@ export default function ContactsList({ onAdd }) {
     visible: { opacity: 1, y: 0, transition: { duration: reduced ? 0 : 0.32 } },
   };
   return (
-    <section aria-label="Contact directory">
+    <section aria-label={t("Contact directory")}>
       <div className="mb-8 grid gap-3 sm:grid-cols-3">
         {[
           {
@@ -77,10 +79,10 @@ export default function ContactsList({ onAdd }) {
           >
             <div>
               <p className="text-xs text-stone-500 dark:text-stone-400">
-                {label}
+                {t(label)}
               </p>
               <p className="mt-1 text-2xl font-semibold tracking-tight">
-                {value}
+                {number(Number(value), 2)}
               </p>
             </div>
             <StatIcon icon={Icon} />
@@ -89,19 +91,19 @@ export default function ContactsList({ onAdd }) {
       </div>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-2">
-          <h2 className="text-base font-semibold">All contacts</h2>
+          <h2 className="text-base font-semibold">{t("All contacts")}</h2>
           <span className="rounded-md bg-stone-200/60 px-2 py-0.5 text-[11px] font-medium text-stone-500 dark:bg-white/10 dark:text-stone-300">
-            {data.length}
+            {number(data.length)}
           </span>
         </div>
         <div className="relative w-full sm:w-80">
           <Search
             size={17}
-            className="pointer-events-none absolute left-3.5 top-3 text-stone-400"
+            className="pointer-events-none absolute start-3.5 top-3 text-stone-400"
           />
           <input
-            aria-label="Search contacts"
-            placeholder="Search your contacts…"
+            aria-label={t("Search contacts")}
+            placeholder={t("Search your contacts…")}
             className="w-full rounded-xl border border-stone-200 bg-white py-2.5 pl-10 pr-10 text-sm outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 dark:border-white/10 dark:bg-white/5"
             value={searchTerm}
             onChange={(e) =>
@@ -110,8 +112,8 @@ export default function ContactsList({ onAdd }) {
           />
           {searchTerm && (
             <button
-              className="icon-button absolute right-1 top-0.5"
-              aria-label="Clear search"
+              className="icon-button absolute end-1 top-0.5"
+              aria-label={t("Clear search")}
               onClick={() => dispatch({ type: "SET_SEARCH", payload: "" })}
             >
               <X size={15} />
@@ -128,13 +130,15 @@ export default function ContactsList({ onAdd }) {
             className="overflow-hidden"
           >
             <div className="mb-5 flex items-center justify-between rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 dark:border-emerald-900 dark:bg-emerald-950">
-              <span className="text-sm">{selected.length} selected</span>
+              <span className="text-sm">
+                {t("{count} selected", { count: number(selected.length) })}
+              </span>
               <Motion.button
                 whileTap={{ scale: 0.96 }}
                 className="flex items-center gap-2 text-xs font-semibold text-red-600 dark:text-red-400"
                 onClick={() => dispatch({ type: "RemoveAllItem" })}
               >
-                <Trash2 size={15} /> Delete selected
+                <Trash2 size={15} /> {t("Delete selected")}
               </Motion.button>
             </div>
           </Motion.div>
@@ -151,7 +155,7 @@ export default function ContactsList({ onAdd }) {
           <AnimatePresence mode="popLayout">
             {filtered.map((user) => {
               const name =
-                `${user.name} ${user.lastName}`.trim() || "Unnamed contact";
+                `${user.name} ${user.lastName}`.trim() || t("Unnamed contact");
               const initials =
                 `${user.name?.[0] || ""}${user.lastName?.[0] || ""}`.toUpperCase() ||
                 "?";
@@ -185,7 +189,7 @@ export default function ContactsList({ onAdd }) {
                     <label className="relative flex h-7 w-7 cursor-pointer items-center justify-center">
                       <input
                         type="checkbox"
-                        aria-label={`Select ${name}`}
+                        aria-label={t("Select {name}", { name })}
                         checked={selected.includes(user.id)}
                         onChange={(e) =>
                           dispatch({
@@ -204,11 +208,12 @@ export default function ContactsList({ onAdd }) {
                   <h3
                     className="truncate text-lg font-semibold tracking-tight"
                     title={name}
+                    dir="auto"
                   >
                     {name}
                   </h3>
                   <p className="mt-1 text-[11px] font-medium uppercase tracking-widest text-stone-400">
-                    Personal contact
+                    {t("Personal contact")}
                   </p>
                   <div className="mt-6 space-y-3 text-sm text-stone-500 dark:text-stone-400">
                     <a
@@ -216,8 +221,8 @@ export default function ContactsList({ onAdd }) {
                       className="flex min-w-0 items-center gap-3 hover:text-emerald-700"
                     >
                       <Mail size={15} className="shrink-0" />
-                      <span className="truncate">
-                        {user.email || "No email added"}
+                      <span className="truncate" dir="auto">
+                        {user.email || t("No email added")}
                       </span>
                     </a>
                     <a
@@ -225,15 +230,15 @@ export default function ContactsList({ onAdd }) {
                       className="flex items-center gap-3 hover:text-emerald-700"
                     >
                       <Phone size={15} className="shrink-0" />
-                      <span className="truncate">
-                        {user.phone || "No phone added"}
+                      <span className="truncate" dir="auto">
+                        {user.phone || t("No phone added")}
                       </span>
                     </a>
                   </div>
                   <div className="mt-6 flex min-h-11 items-center justify-between border-t border-stone-100 pt-4 dark:border-white/5">
                     <span className="flex items-center gap-1.5 text-[11px] text-stone-400">
                       <span className="h-1.5 w-1.5 rounded-full bg-emerald-500/70" />{" "}
-                      In your circle
+                      {t("In your circle")}
                     </span>
                     <div className="contact-actions">
                       {user.phone && (
@@ -242,7 +247,7 @@ export default function ContactsList({ onAdd }) {
                           whileTap={{ scale: 0.9 }}
                           className="icon-button"
                           href={`tel:${user.phone}`}
-                          aria-label={`Call ${name}`}
+                          aria-label={t("Call {name}", { name })}
                         >
                           <Phone size={15} />
                         </Motion.a>
@@ -251,7 +256,7 @@ export default function ContactsList({ onAdd }) {
                         whileHover={{ scale: 1.08 }}
                         whileTap={{ scale: 0.9 }}
                         className="icon-button"
-                        aria-label={`Edit ${name}`}
+                        aria-label={t("Edit {name}", { name })}
                         onClick={() =>
                           dispatch({ type: "START_EDIT", payload: user })
                         }
@@ -262,7 +267,7 @@ export default function ContactsList({ onAdd }) {
                         whileHover={{ scale: 1.08 }}
                         whileTap={{ scale: 0.9 }}
                         className="icon-button hover:!bg-red-50 hover:!text-red-600 dark:hover:!bg-red-950"
-                        aria-label={`Delete ${name}`}
+                        aria-label={t("Delete {name}", { name })}
                         onClick={() =>
                           dispatch({ type: "REMOVE_ITEM", payload: user.id })
                         }
@@ -290,12 +295,16 @@ export default function ContactsList({ onAdd }) {
               </span>
             </div>
             <h3 className="text-xl font-semibold tracking-tight">
-              {q ? "No connections found" : "Your circle starts here"}
+              {q ? t("No connections found") : t("Your circle starts here")}
             </h3>
             <p className="mt-2 max-w-xs text-sm leading-relaxed text-stone-500 dark:text-stone-400">
               {q
-                ? "Try a different name, email, or phone number. Your people are just a search away."
-                : "Add your first contact and bring the people who matter into one thoughtful space."}
+                ? t(
+                    "Try a different name, email, or phone number. Your people are just a search away.",
+                  )
+                : t(
+                    "Add your first contact and bring the people who matter into one thoughtful space.",
+                  )}
             </p>
             <Motion.button
               whileHover={{ y: -2 }}
@@ -305,14 +314,17 @@ export default function ContactsList({ onAdd }) {
                 q ? () => dispatch({ type: "SET_SEARCH", payload: "" }) : onAdd
               }
             >
-              {q ? "Clear search" : "Add your first contact"}
+              {q ? t("Clear search") : t("Add your first contact")}
               <ArrowUpRight size={16} />
             </Motion.button>
           </Motion.div>
         )}
       </Motion.div>
       <p className="mt-5 text-xs text-stone-400" aria-live="polite">
-        Showing {filtered.length} of {data.length} contacts
+        {t("Showing {shown} of {total} contacts", {
+          shown: number(filtered.length),
+          total: number(data.length),
+        })}
       </p>
     </section>
   );
